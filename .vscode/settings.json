@@ -1,0 +1,9 @@
+{
+    "python.pythonPath": "/Users/adam/.virtualenvs/alfred-workflow/bin/python",
+    "editor.formatOnType": true,
+    "editor.formatOnSave": true,
+    "python.linting.pylintEnabled": false,
+    "python.linting.mypyEnabled": true,
+    "python.linting.enabled": true,
+    "python.formatting.provider": "black"
+}
