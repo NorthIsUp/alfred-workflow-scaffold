@@ -48,6 +48,8 @@ from pathlib import Path
 from contextlib import contextmanager
 from subprocess import CalledProcessError, check_call
 from tempfile import mkdtemp
+from uuid import UUID, uuid5
+from hashlib import md5
 
 __version__ = "0.6"
 __author__ = "Dean Jackson <deanishe@deanishe.net>"
@@ -100,9 +102,14 @@ def tempdir():
         shutil.rmtree(dirpath)
 
 
+def uuid(namespace, name):
+    seed = UUID(md5(namespace.encode("utf8")).hexdigest())
+    return str(uuid5(seed, name)).upper()
+
+
 def update_plist(
     workflow_dir,
-    name=None,
+    name,
     version=None,
     createdby=None,
     bundleid=None,
@@ -114,10 +121,10 @@ def update_plist(
     with open(workflow_dir / "info.plist", "rb") as f:
         info = plistlib.load(f)
 
+    info["name"] = name
+
     if version:
         info["version"] = version
-    if name:
-        info["name"] = name
     if createdby:
         info["createdby"] = createdby
     if bundleid:
@@ -126,6 +133,9 @@ def update_plist(
         info["disabled"] = disabled
     if webaddress:
         info["webaddress"] = webaddress.lower()
+
+    info["objects"][0]["config"]["keyword"] = name
+    info["objects"][0]["uid"] = uuid(name, "entrypoint")
 
     readme = Path(readme or "")
     info["readme"] = readme.read_text().strip() if readme.is_file() else ""
